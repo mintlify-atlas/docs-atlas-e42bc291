@@ -1,0 +1,138 @@
+---
+title: 'Installation'
+description: 'Install Mailman and make the mailman command available in your terminal.'
+keywords: ['mailman', 'install', 'setup', 'yarn', 'node', 'cli']
+---
+
+## Prerequisites
+
+Before installing Mailman, make sure you have the following available on your system:
+
+- **Node.js** — Mailman is a Node.js application. Any actively supported LTS version works.
+- **yarn** — used to install dependencies and link the CLI globally.
+
+Verify both are installed:
+
+```bash
+node --version
+yarn --version
+```
+
+## Install from source
+
+Mailman is installed by cloning the repository and linking it globally with yarn. It is not currently published to the npm registry.
+
+<Steps>
+  <Step title="Clone the repository">
+    Clone the Mailman repository to your local machine:
+
+    ```bash
+    git clone https://github.com/yangleyland/mailman.git
+    cd mailman
+    ```
+  </Step>
+
+  <Step title="Install dependencies">
+    Install the project's dependencies:
+
+    <CodeGroup>
+
+    ```bash yarn
+    yarn install
+    ```
+
+    ```bash npm
+    npm install
+    ```
+
+    </CodeGroup>
+  </Step>
+
+  <Step title="Build the project">
+    Compile the TypeScript source to JavaScript:
+
+    <CodeGroup>
+
+    ```bash yarn
+    yarn build
+    ```
+
+    ```bash npm
+    npm run build
+    ```
+
+    </CodeGroup>
+
+    This produces the compiled output in the `dist/` directory.
+  </Step>
+
+  <Step title="Link the CLI globally">
+    Register the `mailman` binary on your system path:
+
+    <CodeGroup>
+
+    ```bash yarn
+    yarn link
+    ```
+
+    ```bash npm
+    npm link
+    ```
+
+    </CodeGroup>
+
+    After this step, the `mailman` command is available in any directory.
+  </Step>
+</Steps>
+
+## Verify the installation
+
+Confirm that Mailman is installed and on your path:
+
+```bash
+mailman --version
+```
+
+Expected output:
+
+```
+1.0.0
+```
+
+You can also run `mailman --help` to see all available commands:
+
+```bash
+mailman --help
+```
+
+```
+Usage: mailman [options] [command]
+
+A CLI clone of Postman for managing HTTP requests
+
+Options:
+  -V, --version          output the version number
+  -h, --help             display help for command
+
+Commands:
+  init                   Initialize a new mailman project with sample files
+  list                   List all available requests
+  new                    Create a new request file
+  view <filepath>        View the resolved request that will be made
+  run [filepath]         Run a request (prompts for selection if no filepath given)
+  set-path [path]        Set the default project path for mailman
+  show-path              Show the current default project path
+  help [command]         display help for command
+```
+
+<Note>
+  If `mailman` is not found after linking, check that yarn's global bin directory is on your `PATH`. Run `yarn global bin` to find its location and add it to your shell profile if needed.
+</Note>
+
+## Next steps
+
+With Mailman installed, initialize your first project and make your first request:
+
+<Card title="Quickstart" icon="bolt" href="/quickstart">
+  Create a project, configure environments, and run your first HTTP request.
+</Card>

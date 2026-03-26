@@ -1,0 +1,66 @@
+---
+title: 'Introduction'
+description: 'Mailman is a CLI alternative to Postman for managing and executing HTTP requests from the terminal.'
+keywords: ['mailman', 'cli', 'http', 'api', 'postman', 'terminal', 'requests']
+---
+
+Mailman lets you define, manage, and execute HTTP requests from the terminal using plain JSON files. It is designed for developers who prefer staying in the command line and want their API request collections to live alongside their code in version control.
+
+## Why Mailman?
+
+Postman is powerful, but it comes with a GUI, a proprietary data format, and a sync model that can complicate team workflows. Mailman takes a different approach:
+
+- **Terminal-native** — run requests from your shell, pipe output to other tools, and script complex workflows without leaving the terminal.
+- **Version-controllable** — request files are plain JSON. Commit them, diff them, review them in pull requests.
+- **No account required** — there is no cloud sync, no login, and no telemetry. Your requests stay on your machine.
+
+## Key features
+
+<CardGroup cols={2}>
+  <Card title="Variable interpolation" icon="braces">
+    Use `{{variable}}` syntax in any field of a request file. Variables are resolved from multiple sources in a defined priority order.
+  </Card>
+  <Card title="Multiple environments" icon="layers">
+    Define `dev`, `prod`, or any custom environment in `config.json`. Switch between them at runtime with the `-e` flag.
+  </Card>
+  <Card title="Environment file support" icon="file-text">
+    Load variables from `.env` for shared secrets and `.env.<environment>` for environment-specific overrides — no extra configuration needed.
+  </Card>
+  <Card title="Runtime variable overrides" icon="sliders">
+    Pass `-v KEY=value` at the command line to override any variable for a single run without editing any files.
+  </Card>
+  <Card title="Interactive selection" icon="list">
+    Run `mailman run` without a file path and choose a request interactively, or create a new one on the spot.
+  </Card>
+  <Card title="Request previewing" icon="eye">
+    Use `mailman view` to inspect the fully resolved request — with all variables substituted — before sending it.
+  </Card>
+  <Card title="Bearer token authentication" icon="key">
+    Add an `Authorization` header directly in your request file. Reference a variable so the token stays out of source control.
+  </Card>
+  <Card title="Cookie support" icon="cookie">
+    Define named cookie groups per environment in `config.json`. Mailman injects them as a `Cookie` header automatically.
+  </Card>
+  <Card title="Global default path" icon="folder">
+    Use `mailman set-path` to configure a default project directory, so you can run `mailman` commands from anywhere.
+  </Card>
+</CardGroup>
+
+## How it compares to Postman
+
+| | Mailman | Postman |
+|---|---|---|
+| Interface | Terminal | GUI |
+| Request storage | Plain JSON files | Proprietary collections |
+| Version control | Native (just commit the files) | Requires export/import or paid sync |
+| Environment config | `.env` files + `config.json` | Postman environments UI |
+| Scripting | Shell scripts and pipes | Postman scripts (JavaScript) |
+| Authentication required | No | No (free tier) |
+
+Mailman is not a full replacement for every Postman feature. It does not have a visual response inspector, test runner, or mock server. It is the right tool when you want a fast, scriptable, diff-friendly workflow for your HTTP requests.
+
+## Next steps
+
+<Card title="Installation" icon="download" href="/installation">
+  Install Mailman and make the `mailman` command available globally.
+</Card>

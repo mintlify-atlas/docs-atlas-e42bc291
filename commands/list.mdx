@@ -1,0 +1,56 @@
+---
+title: "mailman list"
+description: "List all available request files in your project."
+---
+
+The `mailman list` command scans the `requests/` directory and prints the name and file path of every request it finds. Use it to get a quick overview of the requests available in your project.
+
+## Syntax
+
+```bash
+mailman list
+```
+
+This command takes no arguments or flags.
+
+## What the output shows
+
+For each request file found, Mailman prints:
+
+- **Name** — the `name` field from the request JSON file
+- **Filepath** — the path to the JSON file on disk
+
+## Example
+
+```bash
+mailman list
+```
+
+Sample output:
+
+```
+Available requests:
+
+  Get Users
+  /your-project/requests/get-users.json
+
+  Create User
+  /your-project/requests/create-user.json
+```
+
+<Note>
+  `mailman list` requires a `config.json` in your project directory. Run [`mailman init`](/commands/init) if you haven't set up a project yet.
+</Note>
+
+If no request files are found in the `requests/` directory, Mailman prints a warning and exits without error.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Run a request" href="/commands/run">
+    Use `mailman run` to execute any of the listed requests.
+  </Card>
+  <Card title="Create a request" href="/commands/new">
+    Use `mailman new` to add a new request to your project.
+  </Card>
+</CardGroup>

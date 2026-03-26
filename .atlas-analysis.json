@@ -1,0 +1,63 @@
+{
+  "projectType": "cli-tool",
+  "projectName": "Mailman",
+  "projectDescription": "A CLI alternative to Postman for managing and executing HTTP requests from the terminal using JSON-based request files and environment-based variable interpolation.",
+  "theme": "luma",
+  "primaryColor": "#4F46E5",
+  "lightColor": "#818CF8",
+  "darkColor": "#3730A3",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": ["introduction", "installation", "quickstart"]
+          },
+          {
+            "group": "Commands",
+            "pages": [
+              "commands/init",
+              "commands/run",
+              "commands/view",
+              "commands/list",
+              "commands/new",
+              "commands/set-path"
+            ]
+          },
+          {
+            "group": "Configuration",
+            "pages": [
+              "configuration/config-file",
+              "configuration/request-files",
+              "configuration/environments",
+              "configuration/variables",
+              "configuration/cookies"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "JSON-based request files with {{variable}} interpolation",
+    "Multiple environment support (dev, prod, etc.)",
+    "Environment file support (.env and .env.<environment>)",
+    "Runtime variable overrides via -v flag",
+    "Interactive request selection and creation",
+    "Request previewing before execution",
+    "Bearer token authentication via headers",
+    "Cookie support with named cookie groups",
+    "Global default project path via set-path"
+  ],
+  "publicApiSurface": [
+    "mailman init",
+    "mailman list",
+    "mailman new",
+    "mailman view <filepath> [-e <env>]",
+    "mailman run [filepath] [-e <env>] [-v <key=value>]",
+    "mailman set-path [path] [-c]",
+    "mailman show-path"
+  ]
+}

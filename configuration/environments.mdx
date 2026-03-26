@@ -1,0 +1,131 @@
+---
+title: "Environments"
+description: "Manage separate variable sets for different deployment contexts."
+---
+
+Environments let you maintain different configurations for different deployment targets — for example, a local development server and a production API — without changing your request files. You switch between them with the `-e` flag at runtime.
+
+## Defining environments
+
+Environments are defined in `config.json` under the `environments` key. Each key is an environment name; each value is an object with `variables` and an optional `cookies` array.
+
+```json config.json
+{
+  "defaultEnvironment": "dev",
+  "environments": {
+    "dev": {
+      "variables": {
+        "baseUrl": "http://localhost:3000",
+        "timeout": "5000"
+      },
+      "cookies": [
+        {
+          "name": "dev-session",
+          "cookies": {
+            "session_id": "dev-abc123"
+          }
+        }
+      ]
+    },
+    "staging": {
+      "variables": {
+        "baseUrl": "https://staging.example.com",
+        "timeout": "10000"
+      }
+    },
+    "prod": {
+      "variables": {
+        "baseUrl": "https://api.example.com",
+        "timeout": "30000"
+      },
+      "cookies": [
+        {
+          "name": "prod-session",
+          "cookies": {
+            "session_id": "prod-xyz789",
+            "csrf_token": "secure-token"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+## Environment fields
+
+<ParamField body="variables" type="object">
+  Key-value pairs used for `{{variable}}` interpolation in your request files. All values must be strings.
+</ParamField>
+
+<ParamField body="cookies" type="array">
+  Named cookie groups available to requests in this environment. See [Cookies](/configuration/cookies) for the full cookie group format and injection behavior.
+</ParamField>
+
+## Setting the default environment
+
+The `defaultEnvironment` field in `config.json` determines which environment is active when you run a command without the `-e` flag.
+
+```json
+{
+  "defaultEnvironment": "dev"
+}
+```
+
+Override it at runtime for any command:
+
+```bash
+mailman run requests/get-users.json -e prod
+mailman view requests/get-users.json -e staging
+```
+
+## .env file support
+
+In addition to `config.json`, Mailman loads a dotenv file from the project root when you run a request. Variables from the dotenv file take priority over `variables` defined in `config.json`.
+
+Mailman loads **one** dotenv file per run:
+
+- If you run with a **non-default environment** (e.g. `mailman run file.json -e prod`), it loads `.env.prod`.
+- If you run with the **default environment** (or no `-e` flag), it loads `.env`.
+
+```bash .env
+API_KEY=my-secret-key
+DEBUG=true
+```
+
+```bash .env.prod
+API_KEY=my-production-secret-key
+RATE_LIMIT=1000
+```
+
+<Tip>
+  Name your dotenv files to match your environment names in `config.json` — for example, if you have a `staging` environment, create `.env.staging` and it will be loaded automatically when you run with `-e staging`.
+</Tip>
+
+## Variable resolution priority
+
+Variables are resolved in the following order, with higher entries winning:
+
+| Priority | Source |
+| -------- | ------ |
+| 1 (highest) | Runtime `-v` arguments |
+| 2 | `.env` or `.env.<environment>` file (one is loaded per run) |
+| 3 | Request `defaultValues` |
+| 4 (lowest) | `variables` in `config.json` |
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="config.json" icon="file-code" href="/configuration/config-file">
+    Full reference for the configuration file.
+  </Card>
+  <Card title="Variables" icon="brackets-curly" href="/configuration/variables">
+    How &#123;&#123;variable&#125;&#125; placeholders are resolved.
+  </Card>
+  <Card title="Cookies" icon="cookie" href="/configuration/cookies">
+    Per-environment cookie groups.
+  </Card>
+  <Card title="mailman run" icon="play" href="/commands/run">
+    Run a request against a specific environment.
+  </Card>
+</CardGroup>

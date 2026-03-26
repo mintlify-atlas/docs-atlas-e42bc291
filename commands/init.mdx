@@ -1,0 +1,121 @@
+---
+title: "mailman init"
+description: "Initialize a new Mailman project with a sample config and request files."
+---
+
+The `mailman init` command sets up a new Mailman project in the current directory. It creates a `config.json` file with two sample environments and a `requests/` directory pre-populated with two example request files.
+
+Run this command once when starting a new project, or when you want to add Mailman to an existing project directory.
+
+## Syntax
+
+```bash
+mailman init
+```
+
+This command takes no arguments or flags. All files are created in the current working directory.
+
+## What it creates
+
+<Steps>
+  <Step title="config.json">
+    The main project configuration file. Sets `dev` as the default environment and defines `dev` and `prod` environments with sample variables.
+
+    ```json
+    {
+      "defaultEnvironment": "dev",
+      "environments": {
+        "dev": {
+          "variables": {
+            "baseUrl": "http://localhost:3000",
+            "exampleVariable": "dev-example-variable"
+          }
+        },
+        "prod": {
+          "variables": {
+            "baseUrl": "https://api.example.com",
+            "exampleVariable": "prod-example-variable"
+          }
+        }
+      }
+    }
+    ```
+  </Step>
+
+  <Step title="requests/ directory">
+    A directory to store your request JSON files. Mailman looks here when listing and running requests.
+  </Step>
+
+  <Step title="requests/get-users.json">
+    A sample GET request that demonstrates URL variable interpolation and authorization headers.
+
+    ```json
+    {
+      "name": "Get Users",
+      "method": "GET",
+      "url": "{{baseUrl}}/users",
+      "headers": {
+        "Authorization": "Bearer {{API_KEY}}"
+      }
+    }
+    ```
+  </Step>
+
+  <Step title="requests/create-user.json">
+    A sample POST request that demonstrates sending a JSON body.
+
+    ```json
+    {
+      "name": "Create User",
+      "method": "POST",
+      "url": "{{baseUrl}}/users",
+      "headers": {
+        "Authorization": "Bearer {{API_KEY}}",
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "name": "John Doe",
+        "email": "john@example.com"
+      }
+    }
+    ```
+  </Step>
+</Steps>
+
+## Skipping existing files
+
+If any of the files already exist, `mailman init` skips them rather than overwriting them. You will see a warning for each skipped file. This means it is safe to re-run `init` in a directory that already has a partial setup.
+
+## Examples
+
+```bash
+# Initialize a new project in the current directory
+mailman init
+```
+
+After running the command, your directory will look like this:
+
+```
+your-project/
+├── config.json
+└── requests/
+    ├── get-users.json
+    └── create-user.json
+```
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="List requests" href="/commands/list">
+    Run `mailman list` to see all available requests.
+  </Card>
+  <Card title="Configure environments" href="/configuration/environments">
+    Edit `config.json` to set up your own environments and variables.
+  </Card>
+  <Card title="Run a request" href="/commands/run">
+    Use `mailman run` to execute a request against your API.
+  </Card>
+  <Card title="Create a request" href="/commands/new">
+    Use `mailman new` to interactively build a new request file.
+  </Card>
+</CardGroup>

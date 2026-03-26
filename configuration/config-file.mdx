@@ -1,0 +1,114 @@
+---
+title: "config.json"
+description: "The main configuration file for a Mailman project."
+---
+
+`config.json` is the central configuration file for a Mailman project. It defines your environments, variables, and cookie groups. Running `mailman init` creates a `config.json` in your current directory with a sensible starter configuration.
+
+## Structure
+
+```json config.json
+{
+  "defaultEnvironment": "dev",
+  "environments": {
+    "dev": {
+      "variables": {
+        "baseUrl": "http://localhost:3000",
+        "exampleVariable": "dev-example-variable"
+      },
+      "cookies": [
+        {
+          "name": "user-session",
+          "cookies": {
+            "session_id": "abc123",
+            "csrf_token": "xyz789"
+          }
+        }
+      ]
+    },
+    "prod": {
+      "variables": {
+        "baseUrl": "https://api.example.com",
+        "exampleVariable": "prod-example-variable"
+      }
+    }
+  }
+}
+```
+
+## Top-level fields
+
+<ParamField body="defaultEnvironment" type="string" required>
+  The environment used when the `-e` flag is not provided at runtime. Must match a key in the `environments` object.
+</ParamField>
+
+<ParamField body="environments" type="object" required>
+  A map of environment names to environment configuration objects. Each key is an environment name (e.g. `"dev"`, `"prod"`) and each value is an [environment object](#environment-fields).
+</ParamField>
+
+## Environment fields
+
+Each entry under `environments` supports the following fields:
+
+<ParamField body="variables" type="object">
+  Key-value pairs used for `{{variable}}` interpolation in request files. Values must be strings. See [Variables](/configuration/variables) for the full resolution order.
+</ParamField>
+
+<ParamField body="cookies" type="array">
+  An array of named cookie groups available for injection into requests. Each item in the array has a `name` and a `cookies` object. See [Cookies](/configuration/cookies) for details.
+
+  <Expandable title="cookie group properties">
+    <ResponseField name="name" type="string" required>
+      A human-readable label for the cookie group. Shown in the interactive selection prompt when multiple groups are defined.
+    </ResponseField>
+    <ResponseField name="cookies" type="object" required>
+      Key-value pairs representing individual cookie names and their values.
+    </ResponseField>
+  </Expandable>
+</ParamField>
+
+## How Mailman locates config.json
+
+When you run any Mailman command, it searches for `config.json` by walking up the directory tree starting from your current working directory. It checks each parent directory until it either finds the file or reaches the filesystem root.
+
+```
+your-project/
+├── config.json        ← found here
+├── requests/
+│   └── get-users.json
+└── src/
+    └── ...            ← running mailman from here still finds config.json
+```
+
+If no `config.json` is found in the directory tree, Mailman falls back to the global default path set with `mailman set-path`. See [set-path](/commands/set-path) for details.
+
+<Tip>
+  You can work from any subdirectory of your project and Mailman will find your `config.json` automatically.
+</Tip>
+
+## Setting a global default path
+
+If you keep your Mailman project in a fixed location, you can register it globally so Mailman finds it from anywhere on your system:
+
+```bash
+mailman set-path /path/to/my-project
+```
+
+This stores the path in `~/.mailman/global.json` and uses it as a fallback when no `config.json` is found in the current directory tree.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Environments" icon="layer-group" href="/configuration/environments">
+    Manage variable sets for different deployment contexts.
+  </Card>
+  <Card title="Variables" icon="brackets-curly" href="/configuration/variables">
+    Use &#123;&#123;variable&#125;&#125; placeholders in request files.
+  </Card>
+  <Card title="Cookies" icon="cookie" href="/configuration/cookies">
+    Inject named cookie groups into requests.
+  </Card>
+  <Card title="mailman init" icon="terminal" href="/commands/init">
+    Generate a starter config.json and sample requests.
+  </Card>
+</CardGroup>

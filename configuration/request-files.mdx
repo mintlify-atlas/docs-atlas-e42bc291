@@ -1,0 +1,148 @@
+---
+title: "Request files"
+description: "JSON files that describe individual HTTP requests."
+---
+
+Request files are JSON files that define a single HTTP request. Mailman reads these files, resolves any `{{variable}}` placeholders, and executes the request. By convention, request files live in a `requests/` directory at the root of your project, but you can place them in any subdirectory.
+
+Running `mailman init` creates two sample request files to get you started.
+
+## Structure
+
+```json requests/get-users.json
+{
+  "name": "Get Users",
+  "method": "GET",
+  "url": "{{baseUrl}}/users",
+  "headers": {
+    "Authorization": "Bearer {{API_KEY}}"
+  },
+  "defaultValues": {
+    "limit": "10"
+  },
+  "body": null,
+  "cookies": true
+}
+```
+
+## Fields
+
+<ParamField body="name" type="string" required>
+  A human-readable label for the request. Shown in the interactive request selection list when you run `mailman run` without a file argument.
+</ParamField>
+
+<ParamField body="method" type="string" required>
+  The HTTP method. Accepted values: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`.
+</ParamField>
+
+<ParamField body="url" type="string" required>
+  The full request URL. Supports `{{variable}}` interpolation — for example, `{{baseUrl}}/users/{{userId}}`.
+</ParamField>
+
+<ParamField body="headers" type="object">
+  Request headers as key-value string pairs. Values support `{{variable}}` interpolation.
+
+  ```json
+  "headers": {
+    "Authorization": "Bearer {{API_KEY}}",
+    "Content-Type": "application/json"
+  }
+  ```
+</ParamField>
+
+<ParamField body="defaultValues" type="object">
+  Default values for `{{variable}}` placeholders used in this request. These have lower priority than environment variables and `.env` files. Use them to provide sensible fallbacks without overriding environment-level configuration.
+
+  ```json
+  "defaultValues": {
+    "limit": "10",
+    "format": "json"
+  }
+  ```
+</ParamField>
+
+<ParamField body="body" type="any">
+  The request body. Can be a JSON object, a string, or `null`. Omit this field entirely for requests that do not send a body (e.g. `GET`).
+
+  ```json
+  "body": {
+    "name": "John Doe",
+    "email": "john@example.com"
+  }
+  ```
+</ParamField>
+
+<ParamField body="cookies" type="boolean">
+  When set to `true`, Mailman injects cookies from the active environment before sending the request. Cookie groups are defined in `config.json`. If multiple groups are defined, you are prompted to choose one. See [Cookies](/configuration/cookies).
+</ParamField>
+
+## Examples
+
+### GET request
+
+```json requests/get-user.json
+{
+  "name": "Get User",
+  "method": "GET",
+  "url": "{{baseUrl}}/users/{{userId}}",
+  "headers": {
+    "Authorization": "Bearer {{API_KEY}}"
+  },
+  "defaultValues": {
+    "userId": "1"
+  }
+}
+```
+
+### POST request with body
+
+```json requests/create-user.json
+{
+  "name": "Create User",
+  "method": "POST",
+  "url": "{{baseUrl}}/users",
+  "headers": {
+    "Authorization": "Bearer {{API_KEY}}",
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "name": "Jane Doe",
+    "email": "jane@example.com",
+    "role": "{{role}}"
+  }
+}
+```
+
+## Running a request file
+
+```bash
+# Run with the default environment
+mailman run requests/get-user.json
+
+# Run against a specific environment
+mailman run requests/get-user.json -e prod
+
+# Override variables at runtime
+mailman run requests/get-user.json -v userId=abc123
+```
+
+<Tip>
+  Variables that cannot be resolved from any source — environment, `.env` files, or `defaultValues` — trigger an interactive prompt before the request is sent.
+</Tip>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Variables" icon="brackets-curly" href="/configuration/variables">
+    How &#123;&#123;variable&#125;&#125; placeholders are resolved.
+  </Card>
+  <Card title="Cookies" icon="cookie" href="/configuration/cookies">
+    Inject cookie groups into requests.
+  </Card>
+  <Card title="mailman run" icon="play" href="/commands/run">
+    Execute a request file.
+  </Card>
+  <Card title="mailman new" icon="file-plus" href="/commands/new">
+    Create a new request file interactively.
+  </Card>
+</CardGroup>

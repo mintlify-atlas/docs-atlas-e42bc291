@@ -1,0 +1,75 @@
+---
+title: "mailman view"
+description: "Preview the fully resolved request without sending it."
+---
+
+The `mailman view` command resolves all variables in a request file and prints the result to your terminal — without actually sending the request. Use it to verify that variable interpolation, environment settings, and headers look correct before running a request.
+
+## Syntax
+
+```bash
+mailman view <filepath> [options]
+```
+
+Unlike [`mailman run`](/commands/run), the `filepath` argument is required.
+
+## Options
+
+<ParamField path="filepath" type="string" required>
+  Path to the request JSON file to preview.
+</ParamField>
+
+<ParamField query="-e, --env" type="string">
+  The environment to use when resolving variables. Falls back to `defaultEnvironment` in `config.json` if not specified.
+</ParamField>
+
+## What the output shows
+
+`mailman view` prints the resolved request in a readable format:
+
+- **Request name** and active environment
+- **Method** — e.g. `GET`, `POST`
+- **URL** — with all `{{variable}}` placeholders substituted
+- **Headers** — with all variables resolved
+- **Body** — pretty-printed JSON if present
+
+<Note>
+  Variable resolution in `view` uses only `config.json` environment variables. It does not load `.env` files or accept `-v` flags. Use [`mailman run`](/commands/run) if you need full variable resolution.
+</Note>
+
+## Examples
+
+<CodeGroup>
+
+```bash Preview a request using the default environment
+mailman view requests/get-users.json
+```
+
+```bash Preview a request using the production environment
+mailman view requests/get-users.json --env prod
+```
+
+```bash Preview a POST request before sending
+mailman view requests/create-user.json --env dev
+```
+
+</CodeGroup>
+
+## Example output
+
+Given a `requests/get-users.json` with `{{baseUrl}}` and a `dev` environment where `baseUrl` is `http://localhost:3000`:
+
+```
+Request: Get Users
+Environment: dev
+
+Method: GET
+URL: http://localhost:3000/users
+
+Headers:
+  Authorization: Bearer {{API_KEY}}
+```
+
+<Tip>
+  `mailman view` is a quick sanity check before running a request against a production environment. Confirm the URL and headers resolve as expected, then run [`mailman run`](/commands/run) with the same flags.
+</Tip>

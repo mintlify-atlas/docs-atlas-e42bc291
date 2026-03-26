@@ -1,0 +1,96 @@
+---
+title: "mailman run"
+description: "Execute an HTTP request and display the response."
+---
+
+The `mailman run` command sends an HTTP request and prints the status code, response time, headers, and body to your terminal. It is the primary command for interacting with your API.
+
+## Syntax
+
+```bash
+mailman run [filepath] [options]
+```
+
+The `filepath` argument is optional. If you omit it, Mailman presents an interactive menu to select from your saved requests, or create a new one on the fly.
+
+## Options
+
+<ParamField path="filepath" type="string">
+  Path to the request JSON file to run. If omitted, an interactive selection prompt appears.
+</ParamField>
+
+<ParamField query="-e, --env" type="string">
+  The environment to use when resolving variables. Falls back to `defaultEnvironment` in `config.json` if not specified.
+</ParamField>
+
+<ParamField query="-v, --var" type="string">
+  Set a variable as a `key=value` pair. Can be passed multiple times to set multiple variables. These take the highest priority in variable resolution.
+</ParamField>
+
+## Variable resolution order
+
+When resolving `{{variable}}` placeholders in your request, Mailman checks the following sources in order. The first source that provides a value wins.
+
+1. **`-v` flags** — variables passed directly on the command line (highest priority)
+2. **`.env` or `.env.<environment>` file** — Mailman loads one dotenv file from your project root. If you specify a non-default environment with `-e`, it loads `.env.<environment>` (e.g. `.env.prod`); otherwise it loads `.env`.
+3. **`defaultValues`** in the request file — per-request fallback values
+4. **`variables`** in `config.json` for the active environment (lowest priority)
+
+<Tip>
+  Use `-v` flags for one-off overrides like API tokens or test data without modifying any files.
+</Tip>
+
+## What the output shows
+
+After the request completes, Mailman prints:
+
+- The request name and active environment
+- The HTTP method and URL
+- **Status** — HTTP status code and text, color-coded green (2xx), yellow (3xx), or red (4xx/5xx)
+- **Time** — total request duration in milliseconds
+- **Response headers** — all headers returned by the server
+- **Response body** — pretty-printed if the body is JSON
+
+## Examples
+
+<CodeGroup>
+
+```bash Run a specific request
+mailman run requests/get-users.json
+```
+
+```bash Run interactively (no filepath)
+mailman run
+```
+
+```bash Run against the production environment
+mailman run requests/get-users.json --env prod
+```
+
+```bash Override a single variable
+mailman run requests/get-users.json -v API_KEY=my-secret-key
+```
+
+```bash Override multiple variables
+mailman run requests/create-user.json \
+  --env prod \
+  -v API_KEY=my-secret-key \
+  -v baseUrl=https://staging.example.com
+```
+
+</CodeGroup>
+
+## Interactive mode
+
+When you run `mailman run` without a filepath, you see a selection prompt listing all requests in your `requests/` directory, plus a **Run new request** option at the top.
+
+- Select a saved request to run it immediately.
+- Select **Run new request** to fill in request details interactively without saving a file.
+
+## Unfilled variables
+
+If any `{{variable}}` placeholders remain unresolved after all sources are checked, Mailman prompts you to enter values for them at runtime before sending the request.
+
+<Note>
+  `mailman run` requires a `config.json` in your project directory. Run [`mailman init`](/commands/init) first if you haven't set up a project yet.
+</Note>

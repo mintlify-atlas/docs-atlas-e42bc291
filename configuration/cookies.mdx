@@ -1,0 +1,160 @@
+---
+title: "Cookies"
+description: "Inject named cookie groups into requests from your environment configuration."
+---
+
+Mailman supports sending cookies with requests through named cookie groups defined in `config.json`. Cookie groups are per-environment, so you can maintain different sessions for development and production without changing your request files.
+
+## How it works
+
+<Steps>
+  <Step title="Define cookie groups in config.json">
+    Add a `cookies` array to one or more environments. Each entry has a `name` and a `cookies` object containing key-value pairs.
+
+    ```json config.json
+    {
+      "defaultEnvironment": "dev",
+      "environments": {
+        "dev": {
+          "variables": {
+            "baseUrl": "http://localhost:3000"
+          },
+          "cookies": [
+            {
+              "name": "dev-session",
+              "cookies": {
+                "session_id": "dev-abc123",
+                "csrf_token": "dev-xyz789"
+              }
+            }
+          ]
+        },
+        "prod": {
+          "variables": {
+            "baseUrl": "https://api.example.com"
+          },
+          "cookies": [
+            {
+              "name": "prod-session",
+              "cookies": {
+                "session_id": "prod-abc123",
+                "csrf_token": "prod-xyz789"
+              }
+            },
+            {
+              "name": "admin-session",
+              "cookies": {
+                "session_id": "admin-secret",
+                "role": "admin"
+              }
+            }
+          ]
+        }
+      }
+    }
+    ```
+  </Step>
+  <Step title="Enable cookies in a request file">
+    Set `"cookies": true` in any request file where you want cookies injected.
+
+    ```json requests/get-profile.json
+    {
+      "name": "Get Profile",
+      "method": "GET",
+      "url": "{{baseUrl}}/profile",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "cookies": true
+    }
+    ```
+  </Step>
+  <Step title="Run the request">
+    Mailman selects the cookie group from the active environment and adds it as a `Cookie` header.
+
+    ```bash
+    mailman run requests/get-profile.json
+    ```
+
+    If multiple cookie groups are defined for the environment, Mailman prompts you to choose one:
+
+    ```
+    ? select cookie
+      dev-session
+    > admin-session
+    ```
+  </Step>
+</Steps>
+
+## Cookie group format
+
+<ParamField body="name" type="string" required>
+  A human-readable label shown in the interactive selection prompt when multiple cookie groups are available.
+</ParamField>
+
+<ParamField body="cookies" type="object" required>
+  Key-value pairs representing cookie names and their values. All values must be strings.
+
+  ```json
+  "cookies": {
+    "session_id": "abc123",
+    "csrf_token": "xyz789",
+    "user_pref": "dark-mode"
+  }
+  ```
+</ParamField>
+
+## Selection behavior
+
+| Cookie groups defined | Behavior |
+| --------------------- | -------- |
+| None | Cookie injection is skipped even if `"cookies": true` is set |
+| One | Used automatically without prompting |
+| Two or more | Interactive prompt asks you to select a group |
+
+## Cookie header format
+
+Mailman serializes the selected cookie group into a standard `Cookie` header:
+
+```
+Cookie: session_id=abc123; csrf_token=xyz789
+```
+
+This header is merged with any other headers defined in the request file. If a `Cookie` header is already present in `headers`, it is overwritten by the injected group.
+
+## Cookies are per-environment
+
+Cookie groups belong to a specific environment. This means:
+
+- Your `dev` environment can use development session tokens.
+- Your `prod` environment can use production tokens.
+- Switching environments with `-e prod` automatically uses that environment's cookie groups.
+
+```bash
+# Uses dev cookie groups
+mailman run requests/get-profile.json
+
+# Uses prod cookie groups
+mailman run requests/get-profile.json -e prod
+```
+
+<Note>
+  Cookies are only injected when `"cookies": true` is set in the request file. Requests without this field are sent without any cookie injection, regardless of what is defined in `config.json`.
+</Note>
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="config.json" icon="file-code" href="/configuration/config-file">
+    Full reference for the configuration file.
+  </Card>
+  <Card title="Request files" icon="file-json" href="/configuration/request-files">
+    Enable cookie injection in a request with the cookies field.
+  </Card>
+  <Card title="Environments" icon="layer-group" href="/configuration/environments">
+    Define separate cookie groups per environment.
+  </Card>
+  <Card title="mailman run" icon="play" href="/commands/run">
+    Run requests with environment-specific cookies.
+  </Card>
+</CardGroup>

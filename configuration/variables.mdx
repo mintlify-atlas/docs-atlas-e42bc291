@@ -1,0 +1,141 @@
+---
+title: "Variables"
+description: "Use {{variable}} placeholders to keep request files generic and reusable."
+---
+
+Variables let you write request files once and reuse them across environments, users, and contexts. Instead of hardcoding values like base URLs or API keys, you embed `{{variable}}` placeholders that Mailman resolves at runtime.
+
+## Syntax
+
+Wrap a variable name in double curly braces: `{{variableName}}`. Variable names are alphanumeric and may include underscores.
+
+```
+{{baseUrl}}
+{{API_KEY}}
+{{userId}}
+{{order_id}}
+```
+
+Variables can appear anywhere in a request file — in the URL, header values, and body values:
+
+```json requests/get-order.json
+{
+  "name": "Get Order",
+  "method": "GET",
+  "url": "{{baseUrl}}/orders/{{orderId}}",
+  "headers": {
+    "Authorization": "Bearer {{API_KEY}}",
+    "X-Tenant-ID": "{{tenantId}}"
+  }
+}
+```
+
+## Resolution order
+
+When Mailman resolves a `{{variable}}`, it checks the following sources in order. The first source that provides a value wins.
+
+| Priority | Source | How to set |
+| -------- | ------ | ---------- |
+| 1 (highest) | Runtime `-v` arguments | `mailman run file.json -v key=value` |
+| 2 | `.env` or `.env.<environment>` file | File in project root — one is loaded per run |
+| 3 | Request `defaultValues` | `"defaultValues"` field in the request file |
+| 4 (lowest) | `variables` in `config.json` | Active environment's `variables` object |
+
+<Warning>
+  If a variable cannot be resolved from any of these sources, Mailman prompts you to enter a value interactively before sending the request. The request is not sent until all variables are filled.
+</Warning>
+
+## Setting variables
+
+### In config.json
+
+Define variables per environment in `config.json`. These provide baseline values for the active environment.
+
+```json config.json
+{
+  "defaultEnvironment": "dev",
+  "environments": {
+    "dev": {
+      "variables": {
+        "baseUrl": "http://localhost:3000"
+      }
+    },
+    "prod": {
+      "variables": {
+        "baseUrl": "https://api.example.com"
+      }
+    }
+  }
+}
+```
+
+### In .env files
+
+Mailman loads a dotenv file from the project root when running a request. If you specify a non-default environment with `-e`, it loads `.env.<environment>` (e.g. `.env.prod`); otherwise it loads `.env`. Only one file is loaded per run.
+
+```bash .env
+API_KEY=my-secret-key
+DEBUG=true
+```
+
+```bash .env.prod
+API_KEY=my-production-secret-key
+```
+
+### In request defaultValues
+
+Use `defaultValues` in a request file for variables with sensible per-request defaults. These are overridden by environment variables and `.env` files.
+
+```json
+{
+  "name": "List Users",
+  "method": "GET",
+  "url": "{{baseUrl}}/users",
+  "defaultValues": {
+    "limit": "20",
+    "page": "1"
+  }
+}
+```
+
+### At runtime with -v
+
+Pass variable overrides directly on the command line. These take the highest priority and override every other source.
+
+```bash
+# Single variable
+mailman run requests/get-user.json -v userId=abc123
+
+# Multiple variables
+mailman run requests/get-user.json -v userId=abc123 -v format=json
+
+# Combined with an environment flag
+mailman run requests/get-user.json -e prod -v userId=abc123
+```
+
+## Interactive prompts
+
+If a variable is not resolved from any source, Mailman pauses before sending the request and asks you to enter a value:
+
+```
+? Fill variable value for userId
+```
+
+This is useful for one-off values like IDs or tokens that change with every request and don't belong in any configuration file.
+
+## Related
+
+<CardGroup cols={2}>
+  <Card title="Environments" icon="layer-group" href="/configuration/environments">
+    Define variable sets per environment.
+  </Card>
+  <Card title="Request files" icon="file-json" href="/configuration/request-files">
+    Use variables in request file fields.
+  </Card>
+  <Card title="mailman run" icon="play" href="/commands/run">
+    Pass runtime variable overrides with -v.
+  </Card>
+  <Card title="mailman view" icon="eye" href="/commands/view">
+    Preview a fully resolved request before running it.
+  </Card>
+</CardGroup>

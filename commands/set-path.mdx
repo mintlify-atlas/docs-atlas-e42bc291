@@ -1,0 +1,63 @@
+---
+title: "mailman set-path / show-path"
+description: "Set or show the global default project path so you can run Mailman commands from any directory."
+---
+
+By default, Mailman looks for `config.json` by searching up the directory tree from your current working directory. The `set-path` command lets you pin a global default project path, so Mailman always finds the right project regardless of where you run it from.
+
+The companion `show-path` command displays the currently configured default path.
+
+## Syntax
+
+```bash
+mailman set-path [path] [options]
+mailman show-path
+```
+
+## set-path options
+
+<ParamField path="path" type="string">
+  The path to the Mailman project directory. If omitted, the current working directory is used. The directory must already contain a `config.json` file.
+</ParamField>
+
+<ParamField query="-c, --clear" type="boolean">
+  Clear the currently configured default project path. Mailman will revert to searching up the directory tree from the current working directory.
+</ParamField>
+
+## Examples
+
+<CodeGroup>
+
+```bash Set path to a specific directory
+mailman set-path /home/user/my-api-project
+```
+
+```bash Set path to the current directory
+mailman set-path
+```
+
+```bash Clear the default project path
+mailman set-path --clear
+```
+
+```bash Show the current default project path
+mailman show-path
+```
+
+</CodeGroup>
+
+## When to use set-path
+
+Use `set-path` when:
+
+- You frequently run `mailman` commands from terminals opened in directories other than your Mailman project.
+- You have a single shared Mailman project and want to access it globally without navigating to its directory first.
+- You use shell aliases or scripts that invoke `mailman` from a fixed working directory.
+
+<Note>
+  The path you provide must contain a `config.json` file. If it does not, `set-path` will print an error and the path will not be saved. Run [`mailman init`](/commands/init) in the target directory first.
+</Note>
+
+<Tip>
+  Run `mailman show-path` any time you want to confirm which project Mailman is currently pointing to.
+</Tip>

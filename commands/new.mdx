@@ -1,0 +1,70 @@
+---
+title: "mailman new"
+description: "Interactively create a new request file."
+---
+
+The `mailman new` command walks you through a series of prompts to build a new HTTP request file and saves it to your project. No flags or arguments are needed — everything is collected interactively.
+
+## Syntax
+
+```bash
+mailman new
+```
+
+This command takes no arguments or flags.
+
+## How it works
+
+<Steps>
+  <Step title="Select a directory">
+    Mailman lists the directories inside your project and asks you to choose where to save the new request file. You can select the root `requests/` directory, any existing subdirectory, or choose **Create new directory** to create a new subdirectory inside `requests/`.
+  </Step>
+
+  <Step title="Enter request details">
+    You are prompted to provide the details of the request:
+
+    - **Method** — select from `GET`, `POST`, `PUT`, `PATCH`, or `DELETE`
+    - **URL** — the endpoint to call; you can use `{{variable}}` placeholders
+    - **Headers** — enter key/value pairs one at a time; type `q` when finished
+    - **Body** — you are asked whether to open your `$EDITOR` (defaults to `vim`) to compose the request body. The editor opens a temporary JSON file; save and close it to continue.
+  </Step>
+
+  <Step title="Enter a filename">
+    Mailman asks for the filename to use when saving the request. The file is saved as JSON in the directory you selected.
+  </Step>
+
+  <Step title="File is written">
+    The new request JSON file is written to disk. You can immediately run it with [`mailman run`](/commands/run) or inspect it with [`mailman view`](/commands/view).
+  </Step>
+</Steps>
+
+## Example
+
+```bash
+mailman new
+```
+
+After completing the prompts, you will have a new file like:
+
+```json
+{
+  "name": "Custom request",
+  "method": "GET",
+  "url": "{{baseUrl}}/orders/{{orderId}}",
+  "headers": {
+    "Authorization": "Bearer {{API_KEY}}"
+  }
+}
+```
+
+<Note>
+  The `name` field is set to `"Custom request"` for all requests created with `mailman new`. You can edit the JSON file directly to give the request a more descriptive name.
+</Note>
+
+<Note>
+  `mailman new` requires a `config.json` in your project directory. Run [`mailman init`](/commands/init) first if you haven't set up a project yet.
+</Note>
+
+<Tip>
+  You can use `{{variable}}` placeholders anywhere in the URL, headers, or body. Mailman resolves them at runtime using your environment config and `.env` files. See [variables](/configuration/variables) for details.
+</Tip>

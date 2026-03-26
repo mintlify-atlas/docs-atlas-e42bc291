@@ -1,97 +1,63 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "Mailman"
+description: "A CLI alternative to Postman for managing and executing HTTP requests from the terminal."
 ---
 
-## Setting up
+Mailman is an open-source command-line tool that brings the power of API testing to your terminal. Define requests as JSON files, manage multiple environments, and run them with a single command — no GUI required.
 
-Get your documentation site up and running in minutes.
-
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
-
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/installation">
+    Install Mailman and get it running in under a minute
   </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Initialize a project and make your first HTTP request
   </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+  <Card title="Command Reference" icon="terminal" href="/commands/run">
+    Explore all available commands and their options
   </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
+  <Card title="Configuration" icon="gear" href="/configuration/config-file">
+    Learn how to configure environments, variables, and cookies
   </Card>
-</Columns>
+</CardGroup>
 
-## Create beautiful pages
+## Why Mailman?
 
-Everything you need to create world-class documentation.
+Mailman keeps your HTTP requests under version control, close to your code, and accessible from any terminal session — no GUI, no cloud sync required.
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
+<CardGroup cols={3}>
+  <Card title="Version-controlled requests" icon="code-branch">
+    Store requests as JSON files alongside your code
   </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
+  <Card title="Multi-environment support" icon="layer-group">
+    Switch between dev, staging, and prod with a single flag
   </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
+  <Card title="Variable interpolation" icon="brackets-curly">
+    Use `{{variable}}` syntax to keep secrets out of request files
   </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
+  <Card title="Interactive mode" icon="list-check">
+    Browse and select requests interactively without remembering file paths
   </Card>
-</Columns>
+  <Card title="Request previews" icon="eye">
+    Preview the fully resolved request before sending it
+  </Card>
+  <Card title="Cookie management" icon="cookie">
+    Manage named cookie groups per environment
+  </Card>
+</CardGroup>
 
-## Need inspiration?
+## How it works
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+<Steps>
+  <Step title="Initialize a project">
+    Run `mailman init` in your project directory to create a `config.json` and sample request files.
+  </Step>
+  <Step title="Define your requests">
+    Create JSON files in the `requests/` directory describing your HTTP calls — method, URL, headers, and body.
+  </Step>
+  <Step title="Configure environments">
+    Set up `dev`, `prod`, and any other environments in `config.json` with their own variables and base URLs.
+  </Step>
+  <Step title="Run requests">
+    Execute `mailman run requests/get-users.json -e prod` to send the request and see the response instantly.
+  </Step>
+</Steps>

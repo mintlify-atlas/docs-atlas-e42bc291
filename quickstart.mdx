@@ -1,80 +1,158 @@
 ---
 title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+description: "Initialize a Mailman project and make your first HTTP request in minutes."
 ---
 
-## Get started in three steps
+This guide walks you through initializing a Mailman project, creating request files, and running your first request.
 
-Get your documentation site running locally and make your first customization.
+<Steps>
+  <Step title="Initialize a project">
+    Run `mailman init` in your project directory:
 
-### Step 1: Set up your local environment
+    ```bash
+    mailman init
+    ```
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+    Mailman creates a `config.json` and a `requests/` directory with sample request files:
 
-### Step 2: Deploy your changes
+    ```
+    Created config.json
+    Created requests/ directory
+    Created requests/get-users.json
+    Created requests/create-user.json
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+    Mailman initialized successfully!
+    Run 'mailman list' to see available requests
+    ```
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+    <Note>
+      If `config.json` already exists, Mailman skips it. Existing request files are also preserved.
+    </Note>
+  </Step>
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+  <Step title="Review the generated files">
+    Open `config.json` to see your environment configuration:
 
-### Step 3: Go live
+    ```json config.json
+    {
+      "defaultEnvironment": "dev",
+      "environments": {
+        "dev": {
+          "variables": {
+            "baseUrl": "http://localhost:3000",
+            "exampleVariable": "dev-example-variable"
+          }
+        },
+        "prod": {
+          "variables": {
+            "baseUrl": "https://api.example.com",
+            "exampleVariable": "prod-example-variable"
+          }
+        }
+      }
+    }
+    ```
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+    And look at the sample request file in `requests/get-users.json`:
+
+    ```json requests/get-users.json
+    {
+      "name": "Get Users",
+      "method": "GET",
+      "url": "{{baseUrl}}/users",
+      "headers": {
+        "Authorization": "Bearer {{API_KEY}}"
+      }
+    }
+    ```
+
+    The `{{baseUrl}}` placeholder is automatically replaced with the matching environment variable when you run the request.
+  </Step>
+
+  <Step title="List available requests">
+    Run `mailman list` to see all requests in the `requests/` directory:
+
+    ```bash
+    mailman list
+    ```
+  </Step>
+
+  <Step title="Preview a request before running">
+    Use `mailman view` to see the fully resolved request without sending it — useful for verifying variable interpolation:
+
+    ```bash
+    mailman view requests/get-users.json
+    ```
+
+    This shows the method, URL, headers, and body with all variables substituted from the default environment.
+  </Step>
+
+  <Step title="Run your first request">
+    Execute the request against your default environment:
+
+    ```bash
+    mailman run requests/get-users.json
+    ```
+
+    Mailman prints the response status, timing, headers, and body:
+
+    ```
+    Running: Get Users
+    Environment: dev
+    GET http://localhost:3000/users
+
+    Status: 200 OK
+    Time: 42ms
+
+    Response Headers:
+      content-type: application/json
+
+    Response Body:
+    [
+      { "id": 1, "name": "Alice" },
+      { "id": 2, "name": "Bob" }
+    ]
+    ```
+
+    <Note>
+      If your request contains variables that cannot be resolved (like `{{API_KEY}}`), Mailman prompts you to enter them interactively before sending.
+    </Note>
+  </Step>
+
+  <Step title="Run against a different environment">
+    Use the `-e` flag to specify an environment:
+
+    ```bash
+    mailman run requests/get-users.json -e prod
+    ```
+
+    This uses `baseUrl` from the `prod` environment in `config.json`.
+  </Step>
+
+  <Step title="Override variables at runtime">
+    Pass variable values directly on the command line with `-v`:
+
+    ```bash
+    mailman run requests/get-users.json -v API_KEY=mytoken -v limit=50
+    ```
+
+    Runtime `-v` arguments have the highest priority and override all other sources.
+  </Step>
+</Steps>
 
 ## Next steps
 
-Now that you have your docs running, explore these key features:
-
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card title="Command reference" icon="terminal" href="/commands/run">
+    Learn all available commands and their flags
+  </Card>
+  <Card title="Configuration" icon="gear" href="/configuration/config-file">
+    Configure environments, variables, and cookies
+  </Card>
+  <Card title="Request files" icon="file-code" href="/configuration/request-files">
+    Learn all request file options including body and cookies
+  </Card>
+  <Card title="Variables" icon="brackets-curly" href="/configuration/variables">
+    Understand the full variable resolution order
+  </Card>
 </CardGroup>
-
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>
